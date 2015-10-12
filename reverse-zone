@@ -1,0 +1,22 @@
+#!/bin/bash
+
+reverse_ip() {
+    echo $1 | awk 'BEGIN{FS=".";ORS="."} {for (i = NF; i > 0; i--){print $i}}'
+}
+
+HOST_IPS=$(hostname -i)
+
+for IP in $HOST_IPS
+do
+REVERSED_IP=$(reverse_ip $IP)
+cat > ${REVERSED_IP}rev<<EOF
+\$ttl 38400
+${REVERSED_IP}in-addr.arpa.        IN      SOA     ns.locket.com. admin.locket.com. (
+                        1444602487
+                        10800
+                        3600
+                        604800
+                        38400 )
+${REVERSED_IP}in-addr.arpa.        IN      NS      ns.locket.com.
+EOF
+done
