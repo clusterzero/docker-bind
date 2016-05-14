@@ -22,7 +22,7 @@ configure() {
 	log "Configuring bind service ..."
 	mkdir -m 0755 -p /var/named/master/zones/
 	autozone
-	cat /etc/bind-conf/named.conf.tpl | envsubst >> /etc/bind/named.conf
+	cat /etc/bind-conf/named.conf.tpl | envsubst > /etc/bind/named.conf
 	if [[ ! -f /etc/bind/db.root ]]
 	then
 		mkdir -p /var/bind/cache
