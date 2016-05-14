@@ -1,0 +1,36 @@
+#!/bin/sh
+
+log () {
+	echo "---> $@"
+}
+
+autozone() {
+	log "Creating autozones file ..."
+	echo "" > /var/named/autozones.conf
+	for zonefile in /var/named/master/zones/*;
+	do	
+                export ZONE="$(basename "$zonefile")"
+                export LOCATION="$(dirname "$zonefile")/$(basename "$zonefile")"
+
+#		export ZONE="$(basename "$zonefile")"
+#		export LOCATION="$(diname "$zonefile")"
+		cat /etc/bind-conf/zone.tpl  | envsubst >> /var/named/autozones.conf
+	done
+}
+
+configure() {
+	log "Configuring bind service ..."
+	mkdir -m 0755 -p /var/named/master/zones/
+	autozone
+	cat /etc/bind-conf/named.conf.tpl | envsubst >> /etc/bind/named.conf
+	if [[ ! -f /etc/bind/db.root ]]
+	then
+		mkdir -p /var/bind/cache
+		cp /etc/bind-conf/db.root /etc/bind/db.root
+	fi
+	chown -R .named /var/named
+	chown -R .named /etc/bind
+}
+
+configure
+exec $@
